@@ -27,6 +27,7 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http
         .csrf(csrf -> csrf.disable()) // Optional: Disable CSRF for simplicity (consider enabling if needed)
+        .cors(Customizer.withDefaults())
         .authorizeHttpRequests(authRequest -> authRequest
             // Permit all requests to "/auth/**"
             .requestMatchers("/auth/**").permitAll()
@@ -44,5 +45,4 @@ public class SecurityConfig {
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
   }
-
 }

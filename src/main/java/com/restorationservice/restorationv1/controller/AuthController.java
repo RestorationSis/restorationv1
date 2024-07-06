@@ -1,6 +1,9 @@
 package com.restorationservice.restorationv1.controller;
 
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,5 +37,11 @@ public class AuthController {
   @GetMapping("/test")
   public ResponseEntity<String> testEndpoint() {
     return ResponseEntity.ok("CORS is working!");
+  }
+
+
+  @PostMapping("/posttest")
+  public ResponseEntity<String> testPostEndpoint(@RequestBody Map<String, String> payload) {
+    return ResponseEntity.ok("POST request success! Received: " + payload);
   }
 }

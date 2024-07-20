@@ -21,7 +21,7 @@ public class AuthService {
   private final JwtService jwtService;
   private final PasswordEncoder passwordEncoder;
   private final AuthenticationManager authenticationManager;
-  //
+
 
   public AuthResponse login(LoginRequest request) {
     authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
@@ -30,7 +30,6 @@ public class AuthService {
     return AuthResponse.builder()
         .token(token)
         .build();
-
   }
 
   public AuthResponse register(RegisterRequest request) {
@@ -48,6 +47,5 @@ public class AuthService {
     return AuthResponse.builder()
         .token(jwtService.getToken(user))
         .build();
-
   }
 }

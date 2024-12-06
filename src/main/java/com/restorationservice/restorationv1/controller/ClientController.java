@@ -13,10 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.restorationservice.restorationv1.model.Client;
-import com.restorationservice.restorationv1.security.AuthResponse;
-import com.restorationservice.restorationv1.security.RegisterRequest;
 import com.restorationservice.restorationv1.service.ClientService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,7 +26,7 @@ public class ClientController {
   private final ClientService clientService;
 
   @PostMapping("/register")
-  public ResponseEntity<Client> register( @RequestBody Client request) {
+  public ResponseEntity<Client> register(@Valid @RequestBody Client request) {
     Client client = clientService.addClient(request);
     return ResponseEntity.ok(client);
   }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.restorationservice.restorationv1.model.Client;
+import com.restorationservice.restorationv1.model.Customer;
 import com.restorationservice.restorationv1.service.ClientService;
 
 import jakarta.validation.Valid;
@@ -26,8 +26,8 @@ public class ClientController {
   private final ClientService clientService;
 
   @PostMapping("/register")
-  public ResponseEntity<Client> register(@Valid @RequestBody Client request) {
-    Client client = clientService.addClient(request);
+  public ResponseEntity<Customer> register(@Valid @RequestBody Customer request) {
+    Customer client = clientService.addClient(request);
     return ResponseEntity.ok(client);
   }
 
@@ -42,9 +42,9 @@ public class ClientController {
   }
 
   @PutMapping("/update")
-  public ResponseEntity<Client> updateClient(@RequestBody Client request) {
+  public ResponseEntity<Customer> updateClient(@RequestBody Customer request) {
     try {
-      Client updatedClient = clientService.updateClient(request);
+      Customer updatedClient = clientService.updateClient(request);
       return ResponseEntity.ok(updatedClient);
     } catch (IllegalArgumentException e) {
       return ResponseEntity.notFound().build();
@@ -52,8 +52,8 @@ public class ClientController {
   }
 
   @GetMapping("/{clientId}")
-  public ResponseEntity<Client> getClientById(@PathVariable String clientId) {
-    Client client = clientService.getClientById(clientId);
+  public ResponseEntity<Customer> getClientById(@PathVariable String clientId) {
+    Customer client = clientService.getClientById(clientId);
     if (client != null) {
       return ResponseEntity.ok(client);
     } else {
@@ -62,8 +62,8 @@ public class ClientController {
   }
 
   @GetMapping("/all")
-  public ResponseEntity<List<Client>> listAllClients() {
-    List<Client> clients = clientService.listAllClients();
+  public ResponseEntity<List<Customer>> listAllClients() {
+    List<Customer> clients = clientService.listAllClients();
     return ResponseEntity.ok(clients);
   }
 }

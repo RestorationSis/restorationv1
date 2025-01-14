@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.restorationservice.restorationv1.model.Client;
+import com.restorationservice.restorationv1.model.Customer;
 import com.restorationservice.restorationv1.repository.ClientRepository;
 
 @Service
@@ -15,7 +15,7 @@ public class ClientServiceImpl implements ClientService {
   private ClientRepository clientRepository;
 
   @Override
-  public Client addClient(Client client) {
+  public Customer addClient(Customer client) {
     return clientRepository.save(client);
   }
 
@@ -34,7 +34,7 @@ public class ClientServiceImpl implements ClientService {
   }
 
   @Override
-  public Client updateClient(Client client) {
+  public Customer updateClient(Customer client) {
     if (clientRepository.existsById(client.getId())) {
       return clientRepository.save(client);
     }
@@ -42,7 +42,7 @@ public class ClientServiceImpl implements ClientService {
   }
 
   @Override
-  public Client getClientById(String clientId) {
+  public Customer getClientById(String clientId) {
     try {
       Long id = Long.parseLong(clientId);
       return clientRepository.findById(id).orElse(null);
@@ -53,7 +53,7 @@ public class ClientServiceImpl implements ClientService {
   }
 
   @Override
-  public List<Client> listAllClients() {
+  public List<Customer> listAllClients() {
     return clientRepository.findAll();
   }
 }

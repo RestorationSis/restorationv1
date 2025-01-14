@@ -1,11 +1,9 @@
 package com.restorationservice.restorationv1.repository;
 
+import com.restorationservice.restorationv1.model.Address;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.restorationservice.restorationv1.model.Customer;
-
 @Repository
-public interface ClientRepository extends JpaRepository<Customer, Long> {
-
+public interface AddressRepository extends JpaRepository<Address, Long> {
 }

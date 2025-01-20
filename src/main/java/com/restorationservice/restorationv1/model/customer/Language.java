@@ -1,4 +1,4 @@
-package com.restorationservice.restorationv1.model;
+package com.restorationservice.restorationv1.model.customer;
 
 import lombok.Getter;
 

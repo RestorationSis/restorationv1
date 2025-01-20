@@ -31,7 +31,7 @@ public class User implements UserDetails {
   @GeneratedValue
   Integer id;
   @Basic
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   String username;
   @Column(nullable = false)
   String lastname;

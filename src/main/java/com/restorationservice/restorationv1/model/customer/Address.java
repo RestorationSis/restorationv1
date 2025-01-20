@@ -1,12 +1,23 @@
-package com.restorationservice.restorationv1.model;
+package com.restorationservice.restorationv1.model.customer;
+
+import java.util.Date;
+
+import org.hibernate.annotations.ColumnDefault;
+
+import com.restorationservice.restorationv1.component.EntityChangeLogListener;
+import com.restorationservice.restorationv1.model.Country;
+import com.restorationservice.restorationv1.model.State;
+import com.restorationservice.restorationv1.security.SecurityUtils;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -19,6 +30,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners(EntityChangeLogListener.class)
 @Table(name = "address")
 public class Address {
 
@@ -48,4 +60,16 @@ public class Address {
   @NotNull(message = "zip code field must not be null")
   @Column(name = "zip_code", nullable = false)
   private String zipCode;
+
+  @Column(name = "isPrimary")
+  @ColumnDefault("false")
+  private Boolean isPrimary;
+
+  @Column(name = "created_by")
+  private String createdBy;
+
+  @PrePersist
+  private void onCreate() {
+    this.createdBy = SecurityUtils.getAuthenticatedUsername();
+  }
 }

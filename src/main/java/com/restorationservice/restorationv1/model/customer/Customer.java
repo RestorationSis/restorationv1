@@ -1,13 +1,20 @@
-package com.restorationservice.restorationv1.model;
+package com.restorationservice.restorationv1.model.customer;
 
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 
+import com.restorationservice.restorationv1.component.EntityChangeLogListener;
+import com.restorationservice.restorationv1.component.EntityListener;
+import com.restorationservice.restorationv1.security.SecurityUtils;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,6 +37,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners({EntityListener.class, EntityChangeLogListener.class})
+
 @Table(name="customer")
 public class Customer {
 
@@ -37,28 +46,19 @@ public class Customer {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", updatable = false, nullable = false)
   private long id;
-  @Column(name = "uuid", nullable = false)
-  private UUID uuid;
+  @Column(name = "number", unique = true, nullable = false, updatable = false)
+  private Long number;
 
   @NotNull(message = "first name field must not be null")
   @Column(name = "first_name", nullable = false)
   private String firstName;
 
-  @Column(name = "second_name", nullable = false)
-  private String secondName;
+  @Column(name = "middle_name", nullable = false)
+  private String middleName;
 
   @NotNull(message = "last name field must not be null")
   @Column(name = "last_name", nullable = false)
   private String lastName;
-
-  @NotNull(message = "driver license field must not be null")
-  @Column(name = "driver_license", nullable = false, unique = true)
-  private String driverLicense;
-
-  @NotNull(message = "birth date field must not be null")
-  @Column(name = "birth_date", nullable = false)
-  @Temporal(TemporalType.DATE)
-  private Date birthDate;
 
   @NotNull(message = "email field must not be null")
   @Email(message = "Email should be valid")
@@ -69,26 +69,42 @@ public class Customer {
   @Column(name = "cellphone", nullable = false, unique = true)
   private String cellphone;
 
-  @Column(name = "telephone", nullable = false)
-  private String telephone;
-
   @OneToMany(targetEntity = Address.class, cascade = CascadeType.ALL)
   @JoinColumn(name = "customer_fk", referencedColumnName = "id")
   private List<Address> address;
 
-  @Column(name = "created_on", nullable = false)
+  @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
+  @JoinColumn(name = "notes_fk", referencedColumnName = "id")
+  private List<Note> notes;
+
+  @Column(name = "created_on", updatable = false,  nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date createdOn;
 
+  @Column(name = "last_update_on", nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastUpdatedOn;
+
   @NotNull(message = "language field must not be null")
-  @Column(name = "person_language", nullable = false)
-  private Language personLanguage;
+  @Column(name = "preferred_language", nullable = false)
+  @Enumerated(EnumType.STRING)
+  private Language prefferedLanguage;
+
+  @Column(name = "status", nullable = false)
+  @Enumerated(EnumType.STRING)
+  private CustomerStatus status;
+
+  @Column(name = "created_by")
+  private String createdBy;
 
   @PrePersist
-  private void generateUUID() {
-    if (this.uuid == null) {
-      this.uuid = UUID.randomUUID();
-    }
+  private void onCreate() {
+    this.createdOn = new Date();
+    this.createdBy = SecurityUtils.getAuthenticatedUsername();
+  }
+
+  public void setNumber(Long number) {
+    this.number = number;
   }
 
 }

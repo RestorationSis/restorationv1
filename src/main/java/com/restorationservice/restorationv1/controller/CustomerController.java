@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.restorationservice.restorationv1.model.customer.Address;
 import com.restorationservice.restorationv1.model.customer.Customer;
 import com.restorationservice.restorationv1.model.dto.AddressDTO;
 import com.restorationservice.restorationv1.model.dto.NoteDTO;
@@ -45,7 +44,7 @@ public class CustomerController {
   }
 
   @PutMapping("/update")
-  public ResponseEntity<Customer> updateClient(@RequestBody Customer request) {
+  public ResponseEntity<Customer> updateClient(@Valid @RequestBody Customer request) {
     try {
       Customer updatedClient = customerService.updateClient(request);
       return ResponseEntity.ok(updatedClient);
@@ -55,7 +54,7 @@ public class CustomerController {
   }
 
   @PutMapping("/address/update")
-  public ResponseEntity<AddressDTO> updateAddress(@RequestBody AddressDTO request) {
+  public ResponseEntity<AddressDTO> updateAddress(@Valid @RequestBody AddressDTO request) {
     try {
       AddressDTO updatedClient = customerService.updateClientAddress(request);
       return ResponseEntity.ok(updatedClient);
@@ -65,7 +64,7 @@ public class CustomerController {
   }
 
   @PostMapping("/address/add")
-  public ResponseEntity<AddressDTO> addAddress(@RequestBody AddressDTO request) {
+  public ResponseEntity<AddressDTO> addAddress(@Valid @RequestBody AddressDTO request) {
     AddressDTO addressDTO = customerService.addAddress(request);
     return ResponseEntity.ok(addressDTO);
   }
@@ -81,7 +80,7 @@ public class CustomerController {
   }
 
   @PutMapping("/note/update")
-  public ResponseEntity<NoteDTO> updateNote(@RequestBody NoteDTO request) {
+  public ResponseEntity<NoteDTO> updateNote(@Valid @RequestBody NoteDTO request) {
     try {
       NoteDTO updatedClient = customerService.updateClientNote(request);
       return ResponseEntity.ok(updatedClient);
@@ -91,7 +90,7 @@ public class CustomerController {
   }
 
   @PostMapping("/note/add")
-  public ResponseEntity<NoteDTO> addNote(@RequestBody NoteDTO request) {
+  public ResponseEntity<NoteDTO> addNote(@Valid @RequestBody NoteDTO request) {
     NoteDTO noteDTO = customerService.addNote(request);
     return ResponseEntity.ok(noteDTO);
   }

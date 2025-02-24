@@ -1,5 +1,14 @@
 package com.restorationservice.restorationv1.model;
 
+import java.io.IOException;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(using = Country.CountryDeserializer.class)
 public enum Country {
   UNITED_STATES("US", "United States"),
   CANADA("CA", "Canada"),
@@ -33,12 +42,21 @@ public enum Country {
     return name;
   }
 
-  public static Country fromCode(String code) {
-    for (Country country : values()) {
-      if (country.getCode().equalsIgnoreCase(code)) {
-        return country;
+  public static class CountryDeserializer extends JsonDeserializer<Country> {
+
+    @Override
+    public Country deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
+        throws IOException, JsonProcessingException {
+
+      String value = jsonParser.getText().toUpperCase().trim();
+
+      for (Country country : Country.values()) {
+        if (country.name().equals(value)) {
+          return country;
+        }
       }
+
+      throw new IllegalArgumentException("Invalid Country value");
     }
-    throw new IllegalArgumentException("No country found for code: " + code);
   }
 }

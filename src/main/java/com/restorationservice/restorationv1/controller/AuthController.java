@@ -15,6 +15,7 @@ import com.restorationservice.restorationv1.security.AuthService;
 import com.restorationservice.restorationv1.security.LoginRequest;
 import com.restorationservice.restorationv1.security.RegisterRequest;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -30,7 +31,7 @@ public class AuthController {
   }
 
   @PostMapping(value = "register")
-  public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+  public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
     return ResponseEntity.ok(authService.register(request));
   }
 

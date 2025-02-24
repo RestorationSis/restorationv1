@@ -1,8 +1,17 @@
 package com.restorationservice.restorationv1.model;
 
+import java.io.IOException;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import lombok.Getter;
 
 @Getter
+@JsonDeserialize(using = State.StateDeserializer.class)
 public enum State {
   ALABAMA("AL", "Alabama"),
   ALASKA("AK", "Alaska"),
@@ -63,4 +72,21 @@ public enum State {
     this.name = name;
   }
 
+  public static class StateDeserializer extends JsonDeserializer<State> {
+
+    @Override
+    public State deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
+        throws IOException, JsonProcessingException {
+
+      String value = jsonParser.getText().toUpperCase().trim();
+
+      for (State state : State.values()) {
+        if (state.name().equals(value)) {
+          return state;
+        }
+      }
+
+      throw new IllegalArgumentException("Invalid State value");
+    }
+  }
 }

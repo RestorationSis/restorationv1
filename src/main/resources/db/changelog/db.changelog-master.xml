@@ -6,5 +6,6 @@
     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <!-- Incluir otros archivos de cambios -->
+    <include file="db/changelog/db.changelog-insert-into-policy_type.xml"/>
     <include file="db/changelog/db.changelog-create-sequence.xml"/>
 </databaseChangeLog>

@@ -4,7 +4,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.restorationservice.restorationv1.model.User;
+import com.restorationservice.restorationv1.model.user.User;
 
 public class SecurityUtils {
 

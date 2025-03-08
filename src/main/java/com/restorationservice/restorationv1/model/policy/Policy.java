@@ -3,6 +3,8 @@ package com.restorationservice.restorationv1.model.policy;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -57,4 +59,8 @@ public class Policy {
 
   @Column(name = "expiration_date", nullable = false)
   private LocalDate expirationDate;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status", nullable = false, length = 20, columnDefinition = "VARCHAR(20) DEFAULT 'ACTIVE'")
+  private Status status = Status.ACTIVE;
 }

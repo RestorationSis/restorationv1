@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 
-import com.restorationservice.restorationv1.model.User;
+import com.restorationservice.restorationv1.model.user.User;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

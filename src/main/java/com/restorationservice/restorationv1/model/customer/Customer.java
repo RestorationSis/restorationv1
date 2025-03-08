@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.restorationservice.restorationv1.component.EntityChangeLogListener;
 import com.restorationservice.restorationv1.component.EntityListener;
 import com.restorationservice.restorationv1.security.SecurityUtils;
@@ -71,10 +72,12 @@ public class Customer {
 
   @OneToMany(targetEntity = Address.class, cascade = CascadeType.ALL)
   @JoinColumn(name = "customer_fk", referencedColumnName = "id")
+  @JsonIgnore
   private List<Address> address;
 
   @OneToMany(targetEntity = Note.class, cascade = CascadeType.ALL)
   @JoinColumn(name = "notes_fk", referencedColumnName = "id")
+  @JsonIgnore
   private List<Note> notes;
 
   @Column(name = "created_on", updatable = false,  nullable = false)

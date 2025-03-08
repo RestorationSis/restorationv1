@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.restorationservice.restorationv1.model.ChangeLog;
 import com.restorationservice.restorationv1.repository.ChangeLogRepository;
 import com.restorationservice.restorationv1.security.SecurityUtils;
@@ -59,6 +60,7 @@ public class EntityChangeLogListener {
   private String serializeEntity(Object entity) {
     try {
       ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.registerModule(new JavaTimeModule()); // Hab
       return objectMapper.writeValueAsString(entity);
     } catch (JsonProcessingException e) {
       return "{}";

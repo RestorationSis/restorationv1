@@ -1,5 +1,6 @@
 package com.restorationservice.restorationv1.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -32,7 +33,7 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
   }
 
-  // 🔹 Nuevo manejador para IllegalArgumentException
+
   @ExceptionHandler(IllegalArgumentException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
@@ -46,4 +47,19 @@ public class GlobalExceptionHandler {
     );
     return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
   }
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<ErrorResponse> handleDuplicateEntryException(DataIntegrityViolationException ex) {
+    List<String> errors = new ArrayList<>();
+    errors.add(ex.getCause().getMessage());
+
+    ErrorResponse errorResponse = new ErrorResponse(
+        HttpStatus.BAD_REQUEST,
+        "Duplicate entry",
+        errors
+    );
+
+    return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+  }
+
 }

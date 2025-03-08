@@ -69,6 +69,9 @@ public class Address {
   @Column(name = "created_by")
   private String createdBy;
 
+  @Column(name = "policy_id", unique = true)
+  private Long policyId;
+
   @PrePersist
   private void onCreate() {
     this.createdBy = SecurityUtils.getAuthenticatedUsername();

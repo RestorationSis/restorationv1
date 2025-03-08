@@ -1,6 +1,7 @@
 package com.restorationservice.restorationv1.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -9,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.restorationservice.restorationv1.model.policy.Policy;
+import com.restorationservice.restorationv1.model.policy.Status;
+
 @Repository
 public interface PolicyRepository extends JpaRepository<Policy, Long> {
   @Modifying
@@ -45,5 +48,6 @@ public interface PolicyRepository extends JpaRepository<Policy, Long> {
       @Param("fromDate") LocalDate fromDate,
       @Param("expirationDate") LocalDate expirationDate);
 
+  List<Policy> findAllByExpirationDateBeforeAndStatusNot(LocalDate expirationDate, Status status);
 }
 

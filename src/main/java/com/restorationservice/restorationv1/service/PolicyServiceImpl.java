@@ -1,9 +1,11 @@
 package com.restorationservice.restorationv1.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +14,7 @@ import com.restorationservice.restorationv1.model.customer.Address;
 import com.restorationservice.restorationv1.model.dto.policy.PolicyDTO;
 import com.restorationservice.restorationv1.model.policy.InsuranceCompany;
 import com.restorationservice.restorationv1.model.policy.Policy;
+import com.restorationservice.restorationv1.model.policy.Status;
 import com.restorationservice.restorationv1.repository.AddressRepository;
 import com.restorationservice.restorationv1.repository.InsuranceCompanyRepository;
 import com.restorationservice.restorationv1.repository.PolicyRepository;
@@ -33,6 +36,7 @@ public class PolicyServiceImpl implements PolicyService {
   public void addPolicy(PolicyDTO policyDTO) {
     Optional<Address> address = addressRepository.findById(policyDTO.getAddressId());
     if (address.isPresent()) {
+      validateExpirationDate(policyDTO.getExpirationDate());
       if (address.get().getPolicyId() == null) {
 
         policyRepository.addPolicy(
@@ -54,6 +58,12 @@ public class PolicyServiceImpl implements PolicyService {
       }
     } else {
       throw new IllegalArgumentException("Address with ID " + policyDTO.getAddressId() + " does not exist.");
+    }
+  }
+
+  private void validateExpirationDate(LocalDate expirationDate){
+    if(expirationDate.isBefore(LocalDate.now())){
+    throw new IllegalArgumentException("Incorrect expiration date");
     }
   }
 
@@ -107,7 +117,6 @@ public class PolicyServiceImpl implements PolicyService {
       Long id = Long.parseLong(policyId);
       return policyRepository.findById(id).orElse(null);
     } catch (NumberFormatException e) {
-      // Handle invalid ID format
     }
     return null;
   }
@@ -151,6 +160,18 @@ public class PolicyServiceImpl implements PolicyService {
   @Override
   public List<InsuranceCompany> listAllInsuranceCompanies() {
     return insuranceCompanyRepository.findAll();
+  }
+
+  @Scheduled(cron = "0 0 0 * * ?")  // Cron expression  12 AM everyday
+  @Transactional
+  public void updateExpiredPoliciesStatus() {
+    LocalDate today = LocalDate.now();
+    List<Policy> policies = policyRepository.findAllByExpirationDateBeforeAndStatusNot(today, Status.INACTIVE);
+
+    for (Policy policy : policies) {
+      policy.setStatus(Status.INACTIVE);
+      policyRepository.save(policy);
+    }
   }
 }
 

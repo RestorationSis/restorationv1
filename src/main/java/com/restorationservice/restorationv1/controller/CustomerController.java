@@ -53,6 +53,22 @@ public class CustomerController {
     }
   }
 
+  @GetMapping("/{clientId}")
+  public ResponseEntity<Customer> getClientById(@PathVariable String clientId) {
+    Customer client = customerService.getClientById(clientId);
+    if (client != null) {
+      return ResponseEntity.ok(client);
+    } else {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  @GetMapping("/all")
+  public ResponseEntity<List<Customer>> listAllClients() {
+    List<Customer> clients = customerService.listAllClients();
+    return ResponseEntity.ok(clients);
+  }
+
   @PutMapping("/address/update")
   public ResponseEntity<AddressDTO> updateAddress(@Valid @RequestBody AddressDTO request) {
     try {
@@ -105,19 +121,7 @@ public class CustomerController {
     }
   }
 
-  @GetMapping("/{clientId}")
-  public ResponseEntity<Customer> getClientById(@PathVariable String clientId) {
-    Customer client = customerService.getClientById(clientId);
-    if (client != null) {
-      return ResponseEntity.ok(client);
-    } else {
-      return ResponseEntity.notFound().build();
-    }
-  }
 
-  @GetMapping("/all")
-  public ResponseEntity<List<Customer>> listAllClients() {
-    List<Customer> clients = customerService.listAllClients();
-    return ResponseEntity.ok(clients);
-  }
+
+
 }

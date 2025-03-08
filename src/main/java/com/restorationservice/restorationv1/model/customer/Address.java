@@ -1,12 +1,8 @@
 package com.restorationservice.restorationv1.model.customer;
 
-import java.util.Date;
-
 import org.hibernate.annotations.ColumnDefault;
 
 import com.restorationservice.restorationv1.component.EntityChangeLogListener;
-import com.restorationservice.restorationv1.model.Country;
-import com.restorationservice.restorationv1.model.State;
 import com.restorationservice.restorationv1.security.SecurityUtils;
 
 import jakarta.persistence.Column;

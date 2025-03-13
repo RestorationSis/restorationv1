@@ -62,6 +62,12 @@ public class CustomerServiceImpl implements CustomerService {
   }
 
   @Override
+  public Address getAddressById(String addressId) {
+    Optional<Address> addressOptional = addressRepository.findById(Long.valueOf(addressId));
+    return addressOptional.orElse(null);
+  }
+
+  @Override
   @Transactional
   public AddressDTO updateClientAddress(AddressDTO address) {
     List<Address> addressList = addressRepository.findAllByCustomerId(address.getCustomerId());

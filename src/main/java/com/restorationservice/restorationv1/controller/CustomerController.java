@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.restorationservice.restorationv1.json.Views;
+import com.restorationservice.restorationv1.model.customer.Address;
 import com.restorationservice.restorationv1.model.customer.Customer;
 import com.restorationservice.restorationv1.model.dto.AddressDTO;
 import com.restorationservice.restorationv1.model.dto.NoteDTO;
@@ -54,6 +57,7 @@ public class CustomerController {
   }
 
   @GetMapping("/{clientId}")
+  @JsonView(Views.Detail.class)
   public ResponseEntity<Customer> getClientById(@PathVariable String clientId) {
     Customer client = customerService.getClientById(clientId);
     if (client != null) {
@@ -64,6 +68,7 @@ public class CustomerController {
   }
 
   @GetMapping("/all")
+  @JsonView(Views.Summary.class)
   public ResponseEntity<List<Customer>> listAllClients() {
     List<Customer> clients = customerService.listAllClients();
     return ResponseEntity.ok(clients);
@@ -94,6 +99,17 @@ public class CustomerController {
       return ResponseEntity.notFound().build();
     }
   }
+
+  @GetMapping("/address/{addressId}")
+  public ResponseEntity<Address> getAddressById(@PathVariable String addressId) {
+    Address address = customerService.getAddressById(addressId);
+    if (address != null) {
+      return ResponseEntity.ok(address);
+    } else {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
 
   @PutMapping("/note/update")
   public ResponseEntity<NoteDTO> updateNote(@Valid @RequestBody NoteDTO request) {

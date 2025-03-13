@@ -2,7 +2,9 @@ package com.restorationservice.restorationv1.model.customer;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.restorationservice.restorationv1.component.EntityChangeLogListener;
+import com.restorationservice.restorationv1.json.Views;
 import com.restorationservice.restorationv1.security.SecurityUtils;
 
 import jakarta.persistence.Column;
@@ -33,39 +35,48 @@ public class Address {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", updatable = false, nullable = false)
+  @JsonView(Views.Summary.class)
   private long id;
 
   @NotNull(message = "streetAddress field must not be null")
   @Column(name = "street_address", nullable = false)
+  @JsonView(Views.Summary.class)
   private String streetAddress;
 
   @NotNull(message = "unit apartment field must not be null")
   @Column(name = "unit_apartment_suite", nullable = false)
+  @JsonView(Views.Summary.class)
   private String unitApartmentSuite;
 
   @NotNull(message = "city field must not be null")
   @Column(name = "city", nullable = false)
+  @JsonView(Views.Summary.class)
   private String city;
 
   @Enumerated(EnumType.STRING)
-
+  @JsonView(Views.Summary.class)
   private State state;
 
   @Enumerated(EnumType.STRING)
+  @JsonView(Views.Summary.class)
   private Country country;
 
   @NotNull(message = "zip code field must not be null")
   @Column(name = "zip_code", nullable = false)
+  @JsonView(Views.Summary.class)
   private String zipCode;
 
   @Column(name = "isPrimary")
   @ColumnDefault("false")
+  @JsonView(Views.Summary.class)
   private Boolean isPrimary;
 
   @Column(name = "created_by")
+  @JsonView(Views.Summary.class)
   private String createdBy;
 
   @Column(name = "policy_id", unique = true)
+  @JsonView(Views.Summary.class)
   private Long policyId;
 
   @PrePersist

@@ -1,4 +1,4 @@
-package com.restorationservice.restorationv1.model;
+package com.restorationservice.restorationv1.model.user;
 
 import java.util.Collection;
 import java.util.List;
@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.restorationservice.restorationv1.model.user.Role;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -31,7 +33,7 @@ public class User implements UserDetails {
   @GeneratedValue
   Integer id;
   @Basic
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   String username;
   @Column(nullable = false)
   String lastname;

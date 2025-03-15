@@ -7,8 +7,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
-import com.restorationservice.restorationv1.model.Role;
-import com.restorationservice.restorationv1.model.User;
+import com.restorationservice.restorationv1.model.user.Role;
+import com.restorationservice.restorationv1.model.user.User;
 import com.restorationservice.restorationv1.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;

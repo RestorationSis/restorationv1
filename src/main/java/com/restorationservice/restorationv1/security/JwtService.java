@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 
-import com.restorationservice.restorationv1.model.User;
+import com.restorationservice.restorationv1.model.user.User;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -47,7 +47,7 @@ public class JwtService {
         .setClaims(extraClaims)
         .setSubject(user.getUsername())
         .setIssuedAt(new Date(System.currentTimeMillis()))
-        .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+        .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7))
         .signWith(getKey(), SignatureAlgorithm.HS256)
         .compact();
   }

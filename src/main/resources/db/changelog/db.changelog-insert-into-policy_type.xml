@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="2-insert-policy-types" author="your_name">
+        <sql>
+            INSERT INTO policy_type  (Id_Type, Group_Type, Cod_Type, Description_Type) VALUES
+            (1, 'All risk', 'H03', 'Standard Homeowners Insurance (All Risk for Structure, Named Perils for Personal Property)'),
+            (2, 'All risk', 'H05', 'Premium Homeowners Policy (All Risk for Both Structure and Personal Property)'),
+            (3, 'All risk', 'DP3', 'Landlord Insurance (All Risk for the Structure, Named Perils for Personal Property)'),
+            (4, 'Named peril', 'H01', 'Basic Named Perils Policy'),
+            (5, 'Named peril', 'H02', 'Broad Named Perils Policy'),
+            (6, 'Named peril', 'H06', 'Condo Insurance'),
+            (7, 'Named peril', 'H07', 'Mobile or Manufactured Home Insurance'),
+            (8, 'Named peril', 'H08', 'Older or Historic Homes Insurance'),
+            (9, 'Named peril', 'DP1', 'Basic Dwelling Policy (Named Perils for Rentals)'),
+            (10, 'Named peril', 'DP2', 'Broad Dwelling Policy (Extended Named Perils for Rentals)');
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

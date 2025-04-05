@@ -30,4 +30,5 @@ public interface PolicyService {
   InsuranceCompany getInsuranceCompanyById(Long companyId);
 
   List<InsuranceCompany> listAllInsuranceCompanies();
+  List<PolicyDTO> getPoliciesByAddressId(Long addressId);
 }

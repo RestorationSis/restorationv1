@@ -15,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.restorationservice.restorationv1.mapper.CustomerAttachmentMapper;
 import com.restorationservice.restorationv1.model.customer.Customer;
-import com.restorationservice.restorationv1.model.customer.attachment.AttachmentType;
 import com.restorationservice.restorationv1.model.customer.attachment.CustomerAttachment;
 import com.restorationservice.restorationv1.model.customer.attachment.FileExtension;
 import com.restorationservice.restorationv1.model.dto.attachment.CustomerAttachmentDTO;
@@ -58,7 +57,7 @@ public class FileAttachmentServiceImpl implements FileAttachmentService {
   public String uploadFile(
       MultipartFile file,
       FileExtension fileExtension,
-      AttachmentType attachmentType,
+      String attachmentType,
       Long customerId,
       Long policyId
   ) throws IOException {

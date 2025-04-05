@@ -49,5 +49,8 @@ public interface PolicyRepository extends JpaRepository<Policy, Long> {
       @Param("expirationDate") LocalDate expirationDate);
 
   List<Policy> findAllByExpirationDateBeforeAndStatusNot(LocalDate expirationDate, Status status);
+
+  @Query(value = "SELECT * FROM policies p WHERE p.address_fk = :addressId", nativeQuery = true)
+  List<Policy> findPoliciesByAddressId(@Param("addressId") Long addressId);
 }
 

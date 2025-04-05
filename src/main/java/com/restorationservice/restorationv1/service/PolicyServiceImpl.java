@@ -1,6 +1,7 @@
 package com.restorationservice.restorationv1.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.restorationservice.restorationv1.component.EntityChangeLogListener;
+import com.restorationservice.restorationv1.mapper.PolicyMapper;
 import com.restorationservice.restorationv1.model.customer.Address;
 import com.restorationservice.restorationv1.model.dto.policy.PolicyDTO;
 import com.restorationservice.restorationv1.model.policy.InsuranceCompany;
@@ -172,6 +174,16 @@ public class PolicyServiceImpl implements PolicyService {
       policy.setStatus(Status.INACTIVE);
       policyRepository.save(policy);
     }
+  }
+  public List<PolicyDTO> getPoliciesByAddressId(Long addressId) {
+    List<Policy> policies = policyRepository.findPoliciesByAddressId(addressId);
+    List<PolicyDTO> policyDTOList = new ArrayList<>();
+
+    policies.forEach(policy -> {
+      policyDTOList.add(PolicyMapper.toDTO(policy));
+    });
+
+    return policyDTOList;
   }
 }
 

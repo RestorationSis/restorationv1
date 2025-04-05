@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.restorationservice.restorationv1.json.Views;
 import com.restorationservice.restorationv1.model.dto.policy.PolicyDTO;
 import com.restorationservice.restorationv1.model.policy.InsuranceCompany;
 import com.restorationservice.restorationv1.model.policy.Policy;
@@ -88,5 +90,10 @@ public class PolicyController {
   public ResponseEntity<List<InsuranceCompany>> listAllInsuranceCompanies() {
     List<InsuranceCompany> companies = policyService.listAllInsuranceCompanies();
     return ResponseEntity.ok(companies);
+  }
+  @GetMapping("/address/{addressId}")
+  public ResponseEntity<List<PolicyDTO>> getPoliciesByAddress(@PathVariable Long addressId) {
+    List<PolicyDTO> policies = policyService.getPoliciesByAddressId(addressId);
+    return ResponseEntity.ok(policies);
   }
 }

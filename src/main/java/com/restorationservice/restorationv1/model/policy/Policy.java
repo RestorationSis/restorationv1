@@ -10,11 +10,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import com.restorationservice.restorationv1.model.customer.Address;
 
@@ -44,9 +45,9 @@ public class Policy {
   @JoinColumn(name = "policy_type_fk", referencedColumnName = "Id_Type", nullable = false)
   private PolicyType policyType;
 
-  @ManyToOne
+  @OneToMany(targetEntity = Address.class, cascade = CascadeType.ALL)
   @JoinColumn(name = "coverage_fk", referencedColumnName = "Id_coverage", nullable = false)
-  private Coverage coverage;
+  private List<Coverage> coverage;
 
   @Column(name = "policy_number", nullable = false, length = 50, unique = true)
   private String policyNumber;

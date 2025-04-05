@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.restorationservice.restorationv1.model.customer.attachment.AttachmentType;
 import com.restorationservice.restorationv1.model.customer.attachment.FileExtension;
 import com.restorationservice.restorationv1.model.dto.attachment.CustomerAttachmentDTO;
 import com.restorationservice.restorationv1.service.FileAttachmentService;
@@ -33,7 +31,7 @@ public class FileAttachmentController {
   public String uploadFile(
       @RequestParam("file") MultipartFile file,
       @RequestParam("fileExtension") FileExtension fileExtension,
-      @RequestParam("attachmentType") AttachmentType attachmentType,
+      @RequestParam("attachmentType") String attachmentType,
       @RequestParam("customerId") Long customerId,
       @RequestParam(value = "policyId", required = false) Long policyId
   ) throws IOException {

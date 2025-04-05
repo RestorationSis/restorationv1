@@ -23,9 +23,8 @@ public class CustomerAttachment {
   @Column(nullable = false)
   private FileExtension fileExtension;
 
-  @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private AttachmentType attachmentType;
+  private String attachmentType;
 
   @Column(name = "db_file_id_name", unique = true)
   private String dbFileId;
@@ -43,4 +42,8 @@ public class CustomerAttachment {
 
   @Column(name = "deleted")
   private Boolean deleted = false;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status")
+  private CustomerAttachmentStatus status = CustomerAttachmentStatus.ACTIVE;
 }

@@ -5,8 +5,14 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <!-- Incluir otros archivos de cambios -->
-    <include file="db/changelog/db.changelog-insert-into-policy_type.xml"/>
-    <include file="db/changelog/db.changelog-create-sequence.xml"/>
-    <include file="db/changelog/db.changelog-drop_column_coverage_fk_from_policies.xml"/>
+    <changeSet id="1-create-sequence-number" author="your_name">
+        <sql>
+            ALTER TABLE policies
+            DROP FOREIGN KEY FK8epuv199cu7bsgakcw7pggb00;
+
+            ALTER TABLE policies
+            DROP COLUMN coverage_fk;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

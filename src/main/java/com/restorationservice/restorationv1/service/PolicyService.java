@@ -15,7 +15,7 @@ public interface PolicyService {
 
   PolicyDTO updatePolicy(PolicyDTO policy);
 
-  Policy getPolicyById(String policyId);
+  PolicyDTO getPolicyById(String policyId);
 
   List<Policy> listAllPolicies();
 

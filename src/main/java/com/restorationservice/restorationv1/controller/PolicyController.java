@@ -1,13 +1,10 @@
 package com.restorationservice.restorationv1.controller;
 
-
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import com.restorationservice.restorationv1.json.Views;
 import com.restorationservice.restorationv1.model.dto.policy.PolicyDTO;
 import com.restorationservice.restorationv1.model.policy.InsuranceCompany;
 import com.restorationservice.restorationv1.model.policy.Policy;
@@ -46,8 +43,8 @@ public class PolicyController {
   }
 
   @GetMapping("/{policyId}")
-  public ResponseEntity<Policy> getPolicyById(@PathVariable String policyId) {
-    Policy policy = policyService.getPolicyById(policyId);
+  public ResponseEntity<PolicyDTO> getPolicyById(@PathVariable String policyId) {
+    PolicyDTO policy = policyService.getPolicyById(policyId);
     if (policy != null) {
       return ResponseEntity.ok(policy);
     } else {

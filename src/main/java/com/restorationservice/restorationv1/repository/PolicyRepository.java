@@ -39,7 +39,8 @@ public interface PolicyRepository extends JpaRepository<Policy, Long> {
       "policy_number = :policyNumber, policy_type_fk = :policyTypeId, " +
       "coverage_limit = :coverageLimit, from_date = :fromDate, " +
       "expiration_date = :expirationDate, address_fk = :addressId, " +
-      "policy_holder = :policyHolder " +
+      "policy_holder = :policyHolder, " +
+      "status = :status " +
       "WHERE Id_policy = :policyId",
       nativeQuery = true)
   void updatePolicy(
@@ -51,7 +52,9 @@ public interface PolicyRepository extends JpaRepository<Policy, Long> {
       @Param("coverageLimit") String coverageLimit,
       @Param("fromDate") LocalDate fromDate,
       @Param("expirationDate") LocalDate expirationDate,
-      @Param("policyHolder") String policyHolder);
+      @Param("policyHolder") String policyHolder,
+      @Param("status") String status);
+
 
   List<Policy> findAllByExpirationDateBeforeAndStatusNot(LocalDate expirationDate, Status status);
 

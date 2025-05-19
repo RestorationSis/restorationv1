@@ -6,8 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.restorationservice.restorationv1.model.dto.policy.PolicyDTO;
+import com.restorationservice.restorationv1.model.dto.policy.PolicyFullDTO;
+import com.restorationservice.restorationv1.model.policy.Coverage;
 import com.restorationservice.restorationv1.model.policy.InsuranceCompany;
 import com.restorationservice.restorationv1.model.policy.Policy;
+import com.restorationservice.restorationv1.model.policy.PolicyType;
+import com.restorationservice.restorationv1.service.CoverageService;
 import com.restorationservice.restorationv1.service.PolicyService;
 
 import jakarta.validation.Valid;
@@ -19,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class PolicyController {
 
   private final PolicyService policyService;
+  private final CoverageService coverageService;
 
   @PostMapping("/register")
   public ResponseEntity<PolicyDTO> register(@Valid @RequestBody PolicyDTO request) {
@@ -53,8 +58,8 @@ public class PolicyController {
   }
 
   @GetMapping("/all")
-  public ResponseEntity<List<Policy>> listAllPolicies() {
-    List<Policy> policies = policyService.listAllPolicies();
+  public ResponseEntity<List<PolicyFullDTO>> listAllPolicies() {
+    List<PolicyFullDTO> policies = policyService.listAllPolicies();
     return ResponseEntity.ok(policies);
   }
 
@@ -92,5 +97,42 @@ public class PolicyController {
   public ResponseEntity<List<PolicyDTO>> getPoliciesByAddress(@PathVariable Long addressId) {
     List<PolicyDTO> policies = policyService.getPoliciesByAddressId(addressId);
     return ResponseEntity.ok(policies);
+  }
+
+
+  @PostMapping("/coverage/register")
+  public ResponseEntity<Coverage> registerCoverage(@Valid @RequestBody Coverage request) {
+    Coverage coverage = coverageService.addCoverage(request);
+    return ResponseEntity.ok(coverage);
+  }
+
+  @DeleteMapping("/coverage/{coverageId}")
+  public ResponseEntity<Void> removeCoverage(@PathVariable Long coverageId) {
+    boolean isRemoved = coverageService.removeCoverage(coverageId);
+    return isRemoved ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+  }
+
+  @PutMapping("/coverage/update")
+  public ResponseEntity<Coverage> updateCoverage(@Valid @RequestBody Coverage request) {
+    Coverage updatedCoverage = coverageService.updateCoverage(request);
+    return ResponseEntity.ok(updatedCoverage);
+  }
+
+  @GetMapping("/coverage/{coverageId}")
+  public ResponseEntity<Coverage> getCoverageById(@PathVariable Long coverageId) {
+    Coverage coverage = coverageService.getCoverageById(coverageId);
+    return coverage != null ? ResponseEntity.ok(coverage) : ResponseEntity.notFound().build();
+  }
+
+  @GetMapping("/coverage/all")
+  public ResponseEntity<List<Coverage>> listAllCoverages() {
+    List<Coverage> coverages = coverageService.listAllCoverages();
+    return ResponseEntity.ok(coverages);
+  }
+
+  @GetMapping("/policyType/all")
+  public ResponseEntity<List<PolicyType>> listAllPolicyTypes() {
+    List<PolicyType> policyTypes = policyService.listAllPolicyTypes();
+    return ResponseEntity.ok(policyTypes);
   }
 }

@@ -1,22 +1,31 @@
 package com.restorationservice.restorationv1.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.restorationservice.restorationv1.json.Views;
 import com.restorationservice.restorationv1.model.customer.Address;
 import com.restorationservice.restorationv1.model.customer.Customer;
+import com.restorationservice.restorationv1.model.customer.CustomerStatus;
+import com.restorationservice.restorationv1.model.customer.Note;
 import com.restorationservice.restorationv1.model.dto.AddressDTO;
+import com.restorationservice.restorationv1.model.dto.CustomerDTO;
 import com.restorationservice.restorationv1.model.dto.NoteDTO;
 import com.restorationservice.restorationv1.service.CustomerService;
 
@@ -56,6 +65,25 @@ public class CustomerController {
     }
   }
 
+  @PatchMapping("/updatePersonalInfo")
+  public ResponseEntity<CustomerDTO> updatePersonalInfo(@Valid @RequestBody CustomerDTO request) {
+      CustomerDTO updatedClient = customerService.updateClientPersonalInfo(request);
+      return ResponseEntity.ok(updatedClient);
+  }
+
+  @PatchMapping("/{id}/status/{status}")
+  public ResponseEntity<Map<String, Object>> updateCustomerStatus(
+      @PathVariable Long id,
+      @PathVariable CustomerStatus status) {
+
+    customerService.updateCustomerStatus(id, status);
+    Map<String, Object> response = new HashMap<>();
+    response.put("id", id);
+    response.put("status", status);
+
+    return new ResponseEntity<>(response, HttpStatus.OK);
+  }
+
   @GetMapping("/{clientId}")
   @JsonView(Views.Detail.class)
   public ResponseEntity<Customer> getClientById(@PathVariable String clientId) {
@@ -67,6 +95,15 @@ public class CustomerController {
     }
   }
 
+  @GetMapping()
+  @JsonView(Views.Summary.class)
+  public ResponseEntity<List<Customer>> getCustomersByStatusAndCreatedBy(
+      @RequestParam(required = false) String status,
+      @RequestParam(required = false) String createdBy) {
+    List<Customer> clients = customerService.getCustomersFiltered(status, createdBy);
+    return ResponseEntity.ok(clients);
+  }
+
   @GetMapping("/all")
   @JsonView(Views.Summary.class)
   public ResponseEntity<List<Customer>> listAllClients() {
@@ -76,12 +113,8 @@ public class CustomerController {
 
   @PutMapping("/address/update")
   public ResponseEntity<AddressDTO> updateAddress(@Valid @RequestBody AddressDTO request) {
-    try {
-      AddressDTO updatedClient = customerService.updateClientAddress(request);
-      return ResponseEntity.ok(updatedClient);
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.notFound().build();
-    }
+    AddressDTO updatedClient = customerService.updateClientAddress(request);
+    return ResponseEntity.ok(updatedClient);
   }
 
   @PostMapping("/address/add")
@@ -105,6 +138,16 @@ public class CustomerController {
     Address address = customerService.getAddressById(addressId);
     if (address != null) {
       return ResponseEntity.ok(address);
+    } else {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  @GetMapping("/note/{customerId}")
+  public ResponseEntity<List<Note>> getNotesByCustomerId(@PathVariable String customerId) {
+    List<Note> notes = customerService.getNotesByCustomerId(customerId);
+    if (notes != null) {
+      return ResponseEntity.ok(notes);
     } else {
       return ResponseEntity.notFound().build();
     }
@@ -136,8 +179,6 @@ public class CustomerController {
       return ResponseEntity.notFound().build();
     }
   }
-
-
 
 
 }

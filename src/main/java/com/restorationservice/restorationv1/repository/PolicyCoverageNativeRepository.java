@@ -17,5 +17,9 @@ public class PolicyCoverageNativeRepository {
     jdbcTemplate.update(sql, policyId, coverageId);
   }
 
-  // Puedes agregar más métodos para otras consultas nativas aquí
+  @Transactional
+  public void removePolicyCoverage(long policyId, long coverageId) {
+    String sql = "delete from policy_coverage where policy_fk = ? and coverage_fk = ?";
+    jdbcTemplate.update(sql, policyId, coverageId);
+  }
 }

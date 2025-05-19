@@ -51,6 +51,7 @@ public class Customer {
   @JsonView(Views.Summary.class)
   private long id;
   @Column(name = "number", unique = true, nullable = false, updatable = false)
+  @JsonView(Views.Summary.class)
   private Long number;
 
   @NotNull(message = "first name field must not be null")

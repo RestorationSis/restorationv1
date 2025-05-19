@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -14,14 +15,17 @@ import com.restorationservice.restorationv1.component.EntityChangeLogListener;
 import com.restorationservice.restorationv1.mapper.PolicyMapper;
 import com.restorationservice.restorationv1.model.customer.Address;
 import com.restorationservice.restorationv1.model.dto.policy.PolicyDTO;
+import com.restorationservice.restorationv1.model.dto.policy.PolicyFullDTO;
 import com.restorationservice.restorationv1.model.policy.Coverage;
 import com.restorationservice.restorationv1.model.policy.InsuranceCompany;
 import com.restorationservice.restorationv1.model.policy.Policy;
+import com.restorationservice.restorationv1.model.policy.PolicyType;
 import com.restorationservice.restorationv1.model.policy.Status;
 import com.restorationservice.restorationv1.repository.AddressRepository;
 import com.restorationservice.restorationv1.repository.InsuranceCompanyRepository;
 import com.restorationservice.restorationv1.repository.PolicyCoverageNativeRepository;
 import com.restorationservice.restorationv1.repository.PolicyRepository;
+import com.restorationservice.restorationv1.repository.PolicyTypeRepository;
 
 @Service
 public class PolicyServiceImpl implements PolicyService {
@@ -37,30 +41,38 @@ public class PolicyServiceImpl implements PolicyService {
   @Autowired
   private PolicyCoverageNativeRepository policyCoverageNativeRepository;
 
+  @Autowired
+  private PolicyTypeRepository policyTypeRepository;
+
   @Override
   @Transactional
   public void addPolicy(PolicyDTO policyDTO) {
     Optional<Address> address = addressRepository.findById(policyDTO.getAddressId());
+    List<Policy> policies = policyRepository.findPoliciesByAddressId(address.get().getId());
     if (address.isPresent()) {
       validateExpirationDate(policyDTO.getExpirationDate());
-      if (address.get().getPolicyId() == null) {
+      if ( address.get().getPolicy() == null || address.get().getPolicy().getStatus().equals(Status.INACTIVE)) {
+        if (validateHasPolicyActive(policies)) {
 
           policyRepository.addPolicy(
-            policyDTO.getAddressId(),
-            policyDTO.getInsuranceCompanyId(),
-            policyDTO.getPolicyNumber(),
-            policyDTO.getPolicyTypeId(),
-            policyDTO.getCoverageLimit(),
-            policyDTO.getFromDate(),
-            policyDTO.getExpirationDate(),
+              policyDTO.getAddressId(),
+              policyDTO.getInsuranceCompanyId(),
+              policyDTO.getPolicyNumber(),
+              policyDTO.getPolicyTypeId(),
+              policyDTO.getCoverageLimit(),
+              policyDTO.getFromDate(),
+              policyDTO.getExpirationDate(),
               policyDTO.getPolicyHolder()
-        );
-        Long policyId = policyRepository.getLastInsertId();
-        address.get().setPolicyId(policyId);
-        addressRepository.save(address.get());
-        listener.onPrePersist(policyDTO);
-        addCoverageToPolicy(policyId, policyDTO.getCoverageIds(), true);
-      } else {
+          );
+          Long policyId = policyRepository.getLastInsertId();
+          addressRepository.addPolicyId(policyId, address.get().getId());
+          listener.onPrePersist(policyDTO);
+          addCoverageToPolicy(policyId, policyDTO.getCoverageIds(), true);
+        }
+        else {
+          throw new IllegalArgumentException("There is already an Active policy");
+        }
+      }  else {
         throw new IllegalArgumentException("Address already has a policy");
       }
     } else {
@@ -69,17 +81,27 @@ public class PolicyServiceImpl implements PolicyService {
   }
 
   private void addCoverageToPolicy(long policyId, List<Long> coverageIds, boolean newPolicy) {
-    Policy policy = policyRepository.getReferenceById(policyId);
+    if(!newPolicy) {
+      Policy policy = policyRepository.getReferenceById(policyId);
 
-    List<Long> existingCoverageIds = policy.getCoverages().stream()
-        .map(Coverage::getId)
-        .toList();
+      List<Long> existingCoverageIds = policy.getCoverages().stream()
+          .map(Coverage::getId)
+          .toList();
 
-    List<Long> coverageIdsToAdd = coverageIds.stream()
-        .filter(coverageId -> !existingCoverageIds.contains(coverageId))
-        .toList();
+      List<Long> coverageIdsToAdd = coverageIds.stream()
+          .filter(coverageId -> !existingCoverageIds.contains(coverageId))
+          .toList();
 
-    coverageIdsToAdd.forEach(coverageId -> policyCoverageNativeRepository.addPolicyCoverage(policyId, coverageId));
+      List<Long> coverageIdsToRemove = existingCoverageIds.stream()
+          .filter(existingId -> !coverageIds.contains(existingId))
+          .toList();
+
+      coverageIdsToAdd.forEach(coverageId -> policyCoverageNativeRepository.addPolicyCoverage(policyId, coverageId));
+      coverageIdsToRemove.forEach(coverageId -> policyCoverageNativeRepository.removePolicyCoverage(policyId, coverageId));
+    }
+    else {
+      coverageIds.forEach(coverageId -> policyCoverageNativeRepository.addPolicyCoverage(policyId, coverageId));
+    }
   }
 
   private void validateExpirationDate(LocalDate expirationDate){
@@ -112,7 +134,7 @@ public class PolicyServiceImpl implements PolicyService {
       Optional<Address> address = addressRepository.findById(policyDTO.getAddressId());
       if (address.isPresent()) {
         validateExpirationDate(policyDTO.getExpirationDate());
-        if (address.get().getPolicyId() == null || address.get().getPolicyId().equals(policyDTO.getPolicyId())) {
+        if (address.get().getPolicy() == null || address.get().getPolicy().getId().equals(policyDTO.getPolicyId())) {
 
           // Update the policy using the updatePolicy method
           policyRepository.updatePolicy(
@@ -124,18 +146,17 @@ public class PolicyServiceImpl implements PolicyService {
               policyDTO.getCoverageLimit(),
               policyDTO.getFromDate(),
               policyDTO.getExpirationDate(),
-              policyDTO.getPolicyHolder()
+              policyDTO.getPolicyHolder(),
+              policyDTO.getStatus()
           );
 
           // Update the address's policyId if it's not already set or matches the current policy
-          if (address.get().getPolicyId() == null) {
-            address.get().setPolicyId(policyDTO.getPolicyId());
-            addressRepository.save(address.get());
+          if (address.get().getPolicy() == null || address.get().getPolicy().getStatus().equals(Status.INACTIVE)) {
+
+           addressRepository.addPolicyId(policyDTO.getPolicyId(), address.get().getId());
           }
 
-          // Update coverages for the policy
-          // Assuming addCoverageToPolicy handles updates based on newPolicy flag
-          addCoverageToPolicy(policyDTO.getPolicyId(), policyDTO.getCoverageIds(), false); // Set newPolicy to false for updates
+          addCoverageToPolicy(policyDTO.getPolicyId(), policyDTO.getCoverageIds(), false);
 
 
           return policyDTO;
@@ -163,9 +184,13 @@ public class PolicyServiceImpl implements PolicyService {
   }
 
   @Override
-  public List<Policy> listAllPolicies() {
-    return policyRepository.findAll();
+  public List<PolicyFullDTO> listAllPolicies() {
+    return policyRepository.findAll()
+        .stream()
+        .map(PolicyMapper::toFullDTO)
+        .collect(Collectors.toList());
   }
+
 
   //insurance company
 
@@ -223,6 +248,20 @@ public class PolicyServiceImpl implements PolicyService {
     });
 
     return policyDTOList;
+  }
+
+  @Override
+  public List<PolicyType> listAllPolicyTypes() {
+   return policyTypeRepository.findAll();
+  }
+
+  private boolean validateHasPolicyActive(List<Policy> policies) {
+    for (Policy policy : policies) {
+      if (policy.getStatus().equals(Status.ACTIVE)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 

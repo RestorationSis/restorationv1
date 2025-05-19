@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.restorationservice.restorationv1.model.dto.policy.PolicyDTO;
+import com.restorationservice.restorationv1.model.dto.policy.PolicyFullDTO;
 import com.restorationservice.restorationv1.model.policy.InsuranceCompany;
 import com.restorationservice.restorationv1.model.policy.Policy;
+import com.restorationservice.restorationv1.model.policy.PolicyType;
 
 public interface PolicyService {
   void addPolicy(PolicyDTO policy);
@@ -17,7 +19,7 @@ public interface PolicyService {
 
   PolicyDTO getPolicyById(String policyId);
 
-  List<Policy> listAllPolicies();
+  List<PolicyFullDTO> listAllPolicies();
 
   @Transactional
   InsuranceCompany addInsuranceCompany(InsuranceCompany company);
@@ -31,4 +33,6 @@ public interface PolicyService {
 
   List<InsuranceCompany> listAllInsuranceCompanies();
   List<PolicyDTO> getPoliciesByAddressId(Long addressId);
+  List<PolicyType> listAllPolicyTypes();
 }
+

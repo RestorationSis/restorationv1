@@ -43,6 +43,11 @@ public class Note {
   @JsonView(Views.Summary.class)
   private Date createdOn;
 
+  @Column(name = "last_update")
+  @Temporal(TemporalType.TIMESTAMP)
+  @JsonView(Views.Summary.class)
+  private Date lastUpdate;
+
   @NotNull(message = "author cannot be null")
   @Column(name = "author", nullable = false)
   @JsonView(Views.Summary.class)

@@ -13,6 +13,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AddressRepository extends JpaRepository<Address, Long> {
 
+
+  @Modifying
+  @Query(value = "UPDATE address SET policy_id = :policyId where id = :addressId", nativeQuery = true)
+  void addPolicyId(@Param("policyId") long policyId, @Param("addressId") long addressId );
   @Modifying
   @Query(value = "DELETE FROM address WHERE customer_fk = :customerId", nativeQuery = true)
   void deleteAllByCustomerId(@Param("customerId") long customerId);

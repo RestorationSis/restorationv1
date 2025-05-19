@@ -1,6 +1,7 @@
 package com.restorationservice.restorationv1.mapper;
 
 import com.restorationservice.restorationv1.model.dto.policy.PolicyDTO;
+import com.restorationservice.restorationv1.model.dto.policy.PolicyFullDTO;
 import com.restorationservice.restorationv1.model.policy.Policy;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,6 +30,33 @@ public class PolicyMapper {
         .fromDate(policy.getFromDate())
         .expirationDate(policy.getExpirationDate())
         .build();
+  }
+
+  public static PolicyFullDTO toFullDTO(Policy policy) {
+    if (policy == null) {
+      return null;
+    }
+
+    List<String> coverageTypes = null;
+    if (policy.getCoverages() != null) {
+      coverageTypes = policy.getCoverages().stream()
+          .map(coverage -> coverage.getCoverageType())
+          .collect(Collectors.toList());
+    }
+
+    return PolicyFullDTO.builder()
+        .policyId(policy.getId())
+        .addressId(policy.getAddress() != null ? policy.getAddress().getId() : null)
+        .insuranceCompany(policy.getInsuranceCompany() != null ? policy.getInsuranceCompany().getCommercialName() : null)
+        .policyType(policy.getPolicyType() != null ? policy.getPolicyType().getCodType() : null)
+        .coverageTypes(coverageTypes)
+        .policyNumber(policy.getPolicyNumber())
+        .coverageLimit(policy.getCoverageLimit())
+        .fromDate(policy.getFromDate())
+        .expirationDate(policy.getExpirationDate())
+        .status(policy.getStatus().name())
+        .build();
+
   }
 
   public static Policy toEntity(PolicyDTO policyDTO) {

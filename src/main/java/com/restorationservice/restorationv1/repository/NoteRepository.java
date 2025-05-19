@@ -19,24 +19,28 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
 
   @Modifying
   @Query(value = "UPDATE notes SET " +
-      "author = :author, " +
-      "content = :content " +
+      "content = :content, last_update = :lastUpdate " +
       "WHERE id = :id AND notes_fk = :customerId",
       nativeQuery = true)
   void updateNote(
       @Param("id") long id,
       @Param("customerId") long customerId,
-      @Param("author") String author,
-      @Param("content") String content);
+      @Param("content") String content,
+      @Param("lastUpdate") Date lastUpdate);
 
   @Modifying
-  @Query(value = "INSERT INTO notes (notes_fk, author, content, created_by, created_on) " +
-      "VALUES (:customerId, :author, :content, :createdBy, :createdOn)",
+  @Query(value = "INSERT INTO notes (notes_fk, author, content, created_by, created_on, last_update) " +
+      "VALUES (:customerId, :author, :content, :createdBy, :createdOn, :lastUpdate)",
       nativeQuery = true)
   void addNote(
       @Param("customerId") long customerId,
       @Param("author") String author,
       @Param("content") String content,
       @Param("createdBy") String createdBy,
-      @Param("createdOn") Date createdOn);
+      @Param("createdOn") Date createdOn,
+      @Param("lastUpdate") Date lastUpdate);
+
+  @Query(value = "SELECT * FROM notes WHERE notes_fk = :customerId", nativeQuery = true)
+  List<Note> findAllByCustomerId(@Param("customerId") long customerId);
 }
+

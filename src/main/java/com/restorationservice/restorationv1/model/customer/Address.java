@@ -5,6 +5,7 @@ import org.hibernate.annotations.ColumnDefault;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.restorationservice.restorationv1.component.EntityChangeLogListener;
 import com.restorationservice.restorationv1.json.Views;
+import com.restorationservice.restorationv1.model.policy.Policy;
 import com.restorationservice.restorationv1.security.SecurityUtils;
 
 import jakarta.persistence.Column;
@@ -15,6 +16,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -75,12 +78,19 @@ public class Address {
   @JsonView(Views.Summary.class)
   private String createdBy;
 
-  @Column(name = "policy_id", unique = true)
+  @ManyToOne // Use ManyToOne to link to the Policy entity
+  @JoinColumn(name = "policy_id", unique = true) // Specify the foreign key column and uniqueness
   @JsonView(Views.Summary.class)
-  private Long policyId;
+  private Policy policy;
+
+  @Column(name = "status")
+  @Enumerated(EnumType.STRING)
+  @JsonView(Views.Summary.class)
+  private AddressStatus status;
 
   @PrePersist
   private void onCreate() {
     this.createdBy = SecurityUtils.getAuthenticatedUsername();
+    this.status = AddressStatus.ACTIVE;
   }
 }

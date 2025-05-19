@@ -46,7 +46,8 @@ public class FileAttachmentServiceImpl implements FileAttachmentService {
 
   @Autowired
   public FileAttachmentServiceImpl(S3Client s3Client, CustomerRepository customerRepository,
-      PolicyRepository policyRepository, CustomerAttachmentRepository customerAttachmentRepository, CustomerAttachmentMapper customerAttachmentMapper) {
+      PolicyRepository policyRepository, CustomerAttachmentRepository customerAttachmentRepository,
+      CustomerAttachmentMapper customerAttachmentMapper) {
     this.s3Client = s3Client;
     this.customerRepository = customerRepository;
     this.policyRepository = policyRepository;
@@ -63,6 +64,7 @@ public class FileAttachmentServiceImpl implements FileAttachmentService {
   ) throws IOException {
     Customer customer = findCustomerById(customerId);
     Policy policy = (policyId != null) ? findPolicyById(policyId) : null;
+    validateCustomerPolicyRelationship(policy,customer);
 
     // First, create and save the attachment to get the ID
     CustomerAttachment attachment = new CustomerAttachment();
@@ -86,6 +88,21 @@ public class FileAttachmentServiceImpl implements FileAttachmentService {
     customerAttachmentRepository.save(attachment);
 
     return "File uploaded successfully: " + dbFileId;
+  }
+
+  private void validateCustomerPolicyRelationship(Policy policy, Customer customer) {
+    if(policy != null && customer != null) {
+      boolean valid = customer.getAddress().stream()
+          .anyMatch(
+              address -> address.getPolicy() != null && address.getPolicy().getId()
+                  .equals(policy.getId()));
+      if (!valid) {
+        throw  new IllegalArgumentException("Policy does not belong to the client");
+      }
+    }
+    else {
+      throw  new IllegalArgumentException("invalid Policy or Customer");
+    }
   }
 
   private Customer findCustomerById(Long customerId) {
@@ -129,7 +146,8 @@ public class FileAttachmentServiceImpl implements FileAttachmentService {
 
     // Devolver la respuesta con el archivo como recurso
     return ResponseEntity.ok()
-        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")  // Asegúrate de que el nombre del archivo tenga comillas si tiene espacios u otros caracteres especiales
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName
+            + "\"")  // Asegúrate de que el nombre del archivo tenga comillas si tiene espacios u otros caracteres especiales
         .contentType(MediaType.APPLICATION_OCTET_STREAM)  // Tipo de contenido binario
         .contentLength(result.response().contentLength())  // Establecer el tamaño del archivo
         .body(resource);  // El archivo en el cuerpo de la respuesta
@@ -152,7 +170,7 @@ public class FileAttachmentServiceImpl implements FileAttachmentService {
 
   @Override
   public List<CustomerAttachmentDTO> getAttachmentsByCustomerId(Long customerId) {
-    return customerAttachmentRepository.findByCustomerId(customerId)
+    return customerAttachmentRepository.findByCustomerIdAndDeletedFalse(customerId)
         .stream()
         .map(customerAttachmentMapper::toDto)
         .toList();
@@ -168,6 +186,7 @@ public class FileAttachmentServiceImpl implements FileAttachmentService {
     attachment.setDeleted(true);
     customerAttachmentRepository.save(attachment);
   }
+
   private void deleteFromS3(String dbFileId) {
     try {
       DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()

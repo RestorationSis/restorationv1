@@ -70,6 +70,8 @@ public class Policy {
   @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false, length = 20, columnDefinition = "VARCHAR(20) DEFAULT 'ACTIVE'")
   private Status status = Status.ACTIVE;
-  @Column(name = "policy_holder", nullable = false)
-  private String policyHolder;
+  @Column(name = "policy_holders", nullable = false)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "policy_id")
+  private List<PolicyHolder> policyHolders;
 }

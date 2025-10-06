@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.restorationservice.restorationv1.component.EntityChangeLogListener;
@@ -13,7 +14,9 @@ import com.restorationservice.restorationv1.json.Views;
 import com.restorationservice.restorationv1.security.SecurityUtils;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
@@ -92,11 +95,13 @@ public class Customer {
   @Column(name = "created_on", updatable = false,  nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   @JsonView(Views.Summary.class)
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
   private Date createdOn;
 
   @Column(name = "last_update_on", nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   @JsonView(Views.Summary.class)
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
   private Date lastUpdatedOn;
 
   @NotNull(message = "language field must not be null")
@@ -113,6 +118,13 @@ public class Customer {
   @Column(name = "created_by")
   @JsonView(Views.Summary.class)
   private String createdBy;
+
+  @ElementCollection
+  @CollectionTable(name = "customer_tags", joinColumns = @JoinColumn(name = "customer_id"))
+  @Column(name = "tag")
+  @Enumerated(EnumType.STRING)
+  @JsonView(Views.Summary.class)
+  private List<CustomerTags> tags;
 
   @PrePersist
   private void onCreate() {

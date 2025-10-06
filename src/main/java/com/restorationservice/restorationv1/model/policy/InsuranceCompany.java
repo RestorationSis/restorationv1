@@ -1,5 +1,6 @@
 package com.restorationservice.restorationv1.model.policy;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,15 +38,18 @@ public class InsuranceCompany implements Serializable {
   @Column(name = "Commercial_name", unique = true, nullable = false, length = 255)
   private String commercialName;
 
+  @JsonIgnore
   @Column(name = "Telephone_1", length = 20)
   private String telephone1;
 
+  @JsonIgnore
   @Column(name = "Telephone_2", length = 20)
   private String telephone2;
 
   @Column(name = "Email_1", length = 255)
   private String email1;
 
+  @JsonIgnore
   @Column(name = "Email_2", length = 255)
   private String email2;
 

@@ -17,8 +17,8 @@ import com.restorationservice.restorationv1.model.policy.Status;
 public interface PolicyRepository extends JpaRepository<Policy, Long> {
   @Modifying
   @Transactional
-  @Query(value = "INSERT INTO policies (address_fk, insurance_company_fk, policy_number, policy_type_fk, coverage_limit, from_date, expiration_date, policy_holder) " +
-      "VALUES (:addressId, :insuranceCompanyId, :policyNumber, :policyTypeId, :coverageLimit, :fromDate, :expirationDate, :policyHolder)",
+  @Query(value = "INSERT INTO policies (address_fk, insurance_company_fk, policy_number, policy_type_fk, coverage_limit, from_date, expiration_date) " +
+      "VALUES (:addressId, :insuranceCompanyId, :policyNumber, :policyTypeId, :coverageLimit, :fromDate, :expirationDate)",
       nativeQuery = true)
   void addPolicy(
       @Param("addressId") long addressId,
@@ -27,8 +27,7 @@ public interface PolicyRepository extends JpaRepository<Policy, Long> {
       @Param("policyTypeId") long policyTypeId,
       @Param("coverageLimit") String coverageLimit,
       @Param("fromDate") LocalDate fromDate,
-      @Param("expirationDate") LocalDate expirationDate,
-      @Param("policyHolder") String policyHolder);
+      @Param("expirationDate") LocalDate expirationDate);
 
 
   @Query(value = "SELECT LAST_INSERT_ID()", nativeQuery = true)
@@ -38,21 +37,18 @@ public interface PolicyRepository extends JpaRepository<Policy, Long> {
   @Query(value = "UPDATE policies SET insurance_company_fk = :insuranceCompanyId, " +
       "policy_number = :policyNumber, policy_type_fk = :policyTypeId, " +
       "coverage_limit = :coverageLimit, from_date = :fromDate, " +
-      "expiration_date = :expirationDate, address_fk = :addressId, " +
-      "policy_holder = :policyHolder, " +
+      "expiration_date = :expirationDate, " +
       "status = :status " +
       "WHERE Id_policy = :policyId",
       nativeQuery = true)
   void updatePolicy(
       @Param("policyId") long policyId,
-      @Param("addressId") long addressId,
       @Param("insuranceCompanyId") long insuranceCompanyId,
       @Param("policyNumber") String policyNumber,
       @Param("policyTypeId") long policyTypeId,
       @Param("coverageLimit") String coverageLimit,
       @Param("fromDate") LocalDate fromDate,
       @Param("expirationDate") LocalDate expirationDate,
-      @Param("policyHolder") String policyHolder,
       @Param("status") String status);
 
 

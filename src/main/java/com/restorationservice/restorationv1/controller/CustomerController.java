@@ -23,10 +23,14 @@ import com.restorationservice.restorationv1.json.Views;
 import com.restorationservice.restorationv1.model.customer.Address;
 import com.restorationservice.restorationv1.model.customer.Customer;
 import com.restorationservice.restorationv1.model.customer.CustomerStatus;
+import com.restorationservice.restorationv1.model.customer.CustomerTags;
 import com.restorationservice.restorationv1.model.customer.Note;
 import com.restorationservice.restorationv1.model.dto.AddressDTO;
+import com.restorationservice.restorationv1.model.dto.AddressDTOnoPolicy;
+import com.restorationservice.restorationv1.model.dto.ContactDTO;
 import com.restorationservice.restorationv1.model.dto.CustomerDTO;
 import com.restorationservice.restorationv1.model.dto.NoteDTO;
+import com.restorationservice.restorationv1.model.policy.Contact;
 import com.restorationservice.restorationv1.service.CustomerService;
 
 import jakarta.validation.Valid;
@@ -134,8 +138,8 @@ public class CustomerController {
   }
 
   @GetMapping("/address/{addressId}")
-  public ResponseEntity<Address> getAddressById(@PathVariable String addressId) {
-    Address address = customerService.getAddressById(addressId);
+  public ResponseEntity<AddressDTOnoPolicy> getAddressById(@PathVariable String addressId) {
+    AddressDTOnoPolicy address = customerService.getAddressById(addressId);
     if (address != null) {
       return ResponseEntity.ok(address);
     } else {
@@ -179,6 +183,59 @@ public class CustomerController {
       return ResponseEntity.notFound().build();
     }
   }
+  @PostMapping("/contact/add")
+  public ResponseEntity<ContactDTO> addContact(@Valid @RequestBody ContactDTO request) {
+    ContactDTO contactDTO = customerService.addContact(request);
+    return ResponseEntity.ok(contactDTO);
+  }
 
+  @PutMapping("/contact/update")
+  public ResponseEntity<ContactDTO> updateContact(@Valid @RequestBody ContactDTO request) {
+    try {
+      ContactDTO updatedContact = customerService.updateContact(request);
+      return ResponseEntity.ok(updatedContact);
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  @DeleteMapping("/contact/{contactId}")
+  public ResponseEntity<Void> removeContact(@PathVariable String contactId) {
+    boolean isRemoved = customerService.removeContact(contactId);
+    if (isRemoved) {
+      return ResponseEntity.noContent().build();
+    } else {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  @GetMapping("/contact/{contactId}")
+  public ResponseEntity<ContactDTO> getContactById(@PathVariable String contactId) {
+    ContactDTO contact = customerService.getContactById(contactId);
+    if (contact != null) {
+      return ResponseEntity.ok(contact);
+    } else {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  @GetMapping("/contact/customer/{customerId}")
+  public ResponseEntity<List<ContactDTO>> getContactsByCustomerId(@PathVariable String customerId) {
+    List<ContactDTO> contacts = customerService.getContactsByCustomerId(customerId);
+    if (contacts != null) {
+      return ResponseEntity.ok(contacts);
+    } else {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  @GetMapping("/tags")
+  public ResponseEntity<List<String>> getAvailableTags() {
+    List<String> tags = List.of(CustomerTags.values())
+        .stream()
+        .map(CustomerTags::getTags)
+        .collect(Collectors.toList());
+    return ResponseEntity.ok(tags);
+  }
 
 }

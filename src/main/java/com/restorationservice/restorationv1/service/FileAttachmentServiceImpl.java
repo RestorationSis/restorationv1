@@ -100,9 +100,6 @@ public class FileAttachmentServiceImpl implements FileAttachmentService {
         throw  new IllegalArgumentException("Policy does not belong to the client");
       }
     }
-    else {
-      throw  new IllegalArgumentException("invalid Policy or Customer");
-    }
   }
 
   private Customer findCustomerById(Long customerId) {

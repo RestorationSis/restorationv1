@@ -1,5 +1,8 @@
 package com.restorationservice.restorationv1.model.dto;
 
+import java.util.List;
+
+import com.restorationservice.restorationv1.model.customer.CustomerTags;
 import com.restorationservice.restorationv1.model.customer.Language;
 import lombok.Data;
 
@@ -13,4 +16,5 @@ public class CustomerDTO {
   private String email;
   private String cellphone;
   private Language prefferedLanguage;
+  private List<CustomerTags> tags;
 }

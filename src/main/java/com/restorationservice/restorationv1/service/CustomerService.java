@@ -7,8 +7,11 @@ import com.restorationservice.restorationv1.model.customer.Customer;
 import com.restorationservice.restorationv1.model.customer.CustomerStatus;
 import com.restorationservice.restorationv1.model.customer.Note;
 import com.restorationservice.restorationv1.model.dto.AddressDTO;
+import com.restorationservice.restorationv1.model.dto.AddressDTOnoPolicy;
+import com.restorationservice.restorationv1.model.dto.ContactDTO;
 import com.restorationservice.restorationv1.model.dto.CustomerDTO;
 import com.restorationservice.restorationv1.model.dto.NoteDTO;
+import com.restorationservice.restorationv1.model.policy.Contact;
 
 
 public interface CustomerService {
@@ -17,7 +20,7 @@ public interface CustomerService {
   Customer updateClient(Customer client);
   CustomerDTO updateClientPersonalInfo(CustomerDTO client);
   void updateCustomerStatus(Long id, CustomerStatus status);
-  Address getAddressById(String addressId);
+  AddressDTOnoPolicy getAddressById(String addressId);
   AddressDTO updateClientAddress(AddressDTO address);
   AddressDTO addAddress(AddressDTO address);
   boolean removeAddress(String addressId);
@@ -28,4 +31,9 @@ public interface CustomerService {
   Customer getClientById(String clientId);
   List<Customer> getCustomersFiltered(String status, String createdBy);
   List<Customer> listAllClients();
+  ContactDTO addContact(ContactDTO contact);
+  ContactDTO updateContact(ContactDTO contact);
+  boolean removeContact(String contactId);
+  ContactDTO getContactById(String contactId);
+  List<ContactDTO> getContactsByCustomerId(String customerId);
 }

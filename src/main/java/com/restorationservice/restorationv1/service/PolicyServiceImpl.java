@@ -24,6 +24,7 @@ import com.restorationservice.restorationv1.model.policy.Status;
 import com.restorationservice.restorationv1.repository.AddressRepository;
 import com.restorationservice.restorationv1.repository.InsuranceCompanyRepository;
 import com.restorationservice.restorationv1.repository.PolicyCoverageNativeRepository;
+import com.restorationservice.restorationv1.repository.PolicyHolderNativeRepository;
 import com.restorationservice.restorationv1.repository.PolicyRepository;
 import com.restorationservice.restorationv1.repository.PolicyTypeRepository;
 
@@ -40,45 +41,52 @@ public class PolicyServiceImpl implements PolicyService {
   private EntityChangeLogListener listener;
   @Autowired
   private PolicyCoverageNativeRepository policyCoverageNativeRepository;
+  @Autowired
+  private PolicyHolderNativeRepository policyHolderNativeRepository;
 
   @Autowired
   private PolicyTypeRepository policyTypeRepository;
 
   @Override
   @Transactional
-  public void addPolicy(PolicyDTO policyDTO) {
+  public long addPolicy(PolicyDTO policyDTO) {
     Optional<Address> address = addressRepository.findById(policyDTO.getAddressId());
-    List<Policy> policies = policyRepository.findPoliciesByAddressId(address.get().getId());
     if (address.isPresent()) {
+    List<Policy> policies = policyRepository.findPoliciesByAddressId(address.get().getId());
       validateExpirationDate(policyDTO.getExpirationDate());
-      if ( address.get().getPolicy() == null || address.get().getPolicy().getStatus().equals(Status.INACTIVE)) {
-        if (validateHasPolicyActive(policies)) {
+      validateHasPolicyActive(policies, policyDTO.getStatus());
 
-          policyRepository.addPolicy(
-              policyDTO.getAddressId(),
-              policyDTO.getInsuranceCompanyId(),
-              policyDTO.getPolicyNumber(),
-              policyDTO.getPolicyTypeId(),
-              policyDTO.getCoverageLimit(),
-              policyDTO.getFromDate(),
-              policyDTO.getExpirationDate(),
-              policyDTO.getPolicyHolder()
-          );
-          Long policyId = policyRepository.getLastInsertId();
-          addressRepository.addPolicyId(policyId, address.get().getId());
-          listener.onPrePersist(policyDTO);
-          addCoverageToPolicy(policyId, policyDTO.getCoverageIds(), true);
-        }
-        else {
-          throw new IllegalArgumentException("There is already an Active policy");
-        }
-      }  else {
-        throw new IllegalArgumentException("Address already has a policy");
-      }
-    } else {
+      policyRepository.addPolicy(
+          policyDTO.getAddressId(),
+          policyDTO.getInsuranceCompanyId(),
+          policyDTO.getPolicyNumber(),
+          policyDTO.getPolicyTypeId(),
+          policyDTO.getCoverageLimit(),
+          policyDTO.getFromDate(),
+          policyDTO.getExpirationDate()
+      );
+      Long policyId = policyRepository.getLastInsertId();
+      addressRepository.addPolicyId(policyId, address.get().getId());
+      listener.onPrePersist(policyDTO);
+      addCoverageToPolicy(policyId, policyDTO.getCoverageIds(), true);
+      addPolicyHoldersToPolicy(policyId, policyDTO.getPolicyHolders());
+
+      return policyId;
+    }
+    else {
       throw new IllegalArgumentException("Address with ID " + policyDTO.getAddressId() + " does not exist.");
     }
   }
+
+  private void addPolicyHoldersToPolicy(long policyId, List<String> policyHolders) {
+    policyHolders.forEach(name -> policyHolderNativeRepository.addPolicyHolder(policyId, name));
+  }
+
+  private void updatePolicyHoldersToPolicy(long policyId, List<String> policyHolders) {
+    policyHolderNativeRepository.removeAllPolicyHolders(policyId);
+    policyHolders.forEach(name -> policyHolderNativeRepository.addPolicyHolder(policyId, name));
+  }
+
 
   private void addCoverageToPolicy(long policyId, List<Long> coverageIds, boolean newPolicy) {
     if(!newPolicy) {
@@ -131,53 +139,43 @@ public class PolicyServiceImpl implements PolicyService {
   @Transactional
   public PolicyDTO updatePolicy(PolicyDTO policyDTO) {
     if (policyRepository.existsById(policyDTO.getPolicyId())) {
-      Optional<Address> address = addressRepository.findById(policyDTO.getAddressId());
-      if (address.isPresent()) {
-        validateExpirationDate(policyDTO.getExpirationDate());
-        if (address.get().getPolicy() == null || address.get().getPolicy().getId().equals(policyDTO.getPolicyId())) {
+      if(policyDTO.getStatus().equals(Status.ACTIVE.name())) {
+        List<Policy> policies = policyRepository.findPoliciesByAddressId(policyDTO.getAddressId());
 
-          // Update the policy using the updatePolicy method
+        if (policies.stream()
+            .anyMatch(p -> p.getStatus() == Status.ACTIVE && !p.getId().equals(policyDTO.getPolicyId()))) {
+          throw new IllegalArgumentException(
+              "There is already an active policy for the address: " + policyDTO.getAddressId());
+        }
+      }
+        validateExpirationDate(policyDTO.getExpirationDate());
+
           policyRepository.updatePolicy(
-              policyDTO.getPolicyId(), // Include the policyId for the WHERE clause
-              policyDTO.getAddressId(),
+              policyDTO.getPolicyId(),
               policyDTO.getInsuranceCompanyId(),
               policyDTO.getPolicyNumber(),
               policyDTO.getPolicyTypeId(),
               policyDTO.getCoverageLimit(),
               policyDTO.getFromDate(),
               policyDTO.getExpirationDate(),
-              policyDTO.getPolicyHolder(),
-              policyDTO.getStatus()
-          );
-
-          // Update the address's policyId if it's not already set or matches the current policy
-          if (address.get().getPolicy() == null || address.get().getPolicy().getStatus().equals(Status.INACTIVE)) {
-
-           addressRepository.addPolicyId(policyDTO.getPolicyId(), address.get().getId());
-          }
+              policyDTO.getStatus());
 
           addCoverageToPolicy(policyDTO.getPolicyId(), policyDTO.getCoverageIds(), false);
-
+          updatePolicyHoldersToPolicy(policyDTO.getPolicyId(), policyDTO.getPolicyHolders());
 
           return policyDTO;
 
-        } else {
-          throw new IllegalArgumentException("Address already has a policy associated with a different policy ID.");
-        }
       } else {
         throw new IllegalArgumentException("Address with ID " + policyDTO.getAddressId() + " does not exist.");
       }
-    } else {
-      throw new IllegalArgumentException("Policy with ID " + policyDTO.getPolicyId() + " does not exist.");
-    }
   }
 
   @Override
-  public PolicyDTO getPolicyById(String policyId) {
+  public PolicyFullDTO getPolicyById(String policyId) {
     try {
       Long id = Long.parseLong(policyId);
 
-      return PolicyMapper.toDTO(policyRepository.findById(id).orElse(null));
+      return PolicyMapper.toFullDTO(policyRepository.findById(id).orElse(null));
     } catch (NumberFormatException ignored) {
     }
     return null;
@@ -239,12 +237,12 @@ public class PolicyServiceImpl implements PolicyService {
       policyRepository.save(policy);
     }
   }
-  public List<PolicyDTO> getPoliciesByAddressId(Long addressId) {
+  public List<PolicyFullDTO> getPoliciesByAddressId(Long addressId) {
     List<Policy> policies = policyRepository.findPoliciesByAddressId(addressId);
-    List<PolicyDTO> policyDTOList = new ArrayList<>();
+    List<PolicyFullDTO> policyDTOList = new ArrayList<>();
 
     policies.forEach(policy -> {
-      policyDTOList.add(PolicyMapper.toDTO(policy));
+      policyDTOList.add(PolicyMapper.toFullDTO(policy));
     });
 
     return policyDTOList;
@@ -255,13 +253,14 @@ public class PolicyServiceImpl implements PolicyService {
    return policyTypeRepository.findAll();
   }
 
-  private boolean validateHasPolicyActive(List<Policy> policies) {
-    for (Policy policy : policies) {
-      if (policy.getStatus().equals(Status.ACTIVE)) {
-        return false;
+  private void validateHasPolicyActive(List<Policy> policies, String requestStatus) {
+    if(requestStatus.equalsIgnoreCase("ACTIVE")) {
+      for (Policy policy : policies) {
+        if (policy.getStatus().equals(Status.ACTIVE)) {
+          throw new IllegalArgumentException("There is already an Active policy");
+        }
       }
     }
-    return true;
   }
 }
 

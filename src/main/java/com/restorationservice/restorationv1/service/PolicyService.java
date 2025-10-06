@@ -11,13 +11,13 @@ import com.restorationservice.restorationv1.model.policy.Policy;
 import com.restorationservice.restorationv1.model.policy.PolicyType;
 
 public interface PolicyService {
-  void addPolicy(PolicyDTO policy);
+  long addPolicy(PolicyDTO policy);
 
   boolean removePolicy(String policyId);
 
   PolicyDTO updatePolicy(PolicyDTO policy);
 
-  PolicyDTO getPolicyById(String policyId);
+  PolicyFullDTO getPolicyById(String policyId);
 
   List<PolicyFullDTO> listAllPolicies();
 
@@ -32,7 +32,7 @@ public interface PolicyService {
   InsuranceCompany getInsuranceCompanyById(Long companyId);
 
   List<InsuranceCompany> listAllInsuranceCompanies();
-  List<PolicyDTO> getPoliciesByAddressId(Long addressId);
+  List<PolicyFullDTO> getPoliciesByAddressId(Long addressId);
   List<PolicyType> listAllPolicyTypes();
 }
 

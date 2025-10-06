@@ -20,6 +20,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,7 +33,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @EntityListeners(EntityChangeLogListener.class)
-@Table(name = "address")
+@Table(
+    name = "address",
+    uniqueConstraints = @UniqueConstraint(
+        name = "UKb3hk53dqg1hnkiha01jk1suku",
+        columnNames = {
+            "street_address",
+            "unit_apartment_suite",
+            "city",
+            "state",
+            "country",
+            "zip_code"
+        }
+    )
+)
 public class Address {
 
   @Id
@@ -42,30 +56,32 @@ public class Address {
   private long id;
 
   @NotNull(message = "streetAddress field must not be null")
-  @Column(name = "street_address", nullable = false)
+  @Column(name = "street_address", nullable = false, length = 100)
   @JsonView(Views.Summary.class)
   private String streetAddress;
 
   @NotNull(message = "unit apartment field must not be null")
-  @Column(name = "unit_apartment_suite", nullable = false)
+  @Column(name = "unit_apartment_suite", nullable = false, length = 100)
   @JsonView(Views.Summary.class)
   private String unitApartmentSuite;
 
   @NotNull(message = "city field must not be null")
-  @Column(name = "city", nullable = false)
+  @Column(name = "city", nullable = false, length = 100)
   @JsonView(Views.Summary.class)
   private String city;
 
   @Enumerated(EnumType.STRING)
+  @Column(length = 100)
   @JsonView(Views.Summary.class)
   private State state;
 
   @Enumerated(EnumType.STRING)
+  @Column(length = 100)
   @JsonView(Views.Summary.class)
   private Country country;
 
   @NotNull(message = "zip code field must not be null")
-  @Column(name = "zip_code", nullable = false)
+  @Column(name = "zip_code", nullable = false, length = 100)
   @JsonView(Views.Summary.class)
   private String zipCode;
 
@@ -74,16 +90,16 @@ public class Address {
   @JsonView(Views.Summary.class)
   private Boolean isPrimary;
 
-  @Column(name = "created_by")
+  @Column(name = "created_by", length = 100)
   @JsonView(Views.Summary.class)
   private String createdBy;
 
-  @ManyToOne // Use ManyToOne to link to the Policy entity
-  @JoinColumn(name = "policy_id", unique = true) // Specify the foreign key column and uniqueness
+  @ManyToOne
+  @JoinColumn(name = "policy_id", unique = true)
   @JsonView(Views.Summary.class)
   private Policy policy;
 
-  @Column(name = "status")
+  @Column(name = "status", length = 100)
   @Enumerated(EnumType.STRING)
   @JsonView(Views.Summary.class)
   private AddressStatus status;

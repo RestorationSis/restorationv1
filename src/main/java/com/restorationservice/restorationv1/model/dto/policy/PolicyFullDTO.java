@@ -16,9 +16,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PolicyFullDTO {
   private long policyId;
-  private long addressId;
+  private long insuranceCompanyId;
   private String insuranceCompany;
+  private long policyTypeId;
   private String policyType;
+  private List<Long> coverageTypeIds;
   private List<String> coverageTypes;
   private String policyNumber;
   private String coverageLimit;
@@ -26,6 +28,7 @@ public class PolicyFullDTO {
   private LocalDate fromDate;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
   private LocalDate expirationDate;
-  private String policyHolder;
+  private List<Long> policyHolderIds;
+  private List<String> policyHolders;
   private String status;
 }

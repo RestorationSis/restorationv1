@@ -1,6 +1,7 @@
 package com.restorationservice.restorationv1.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,4 +19,5 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
   List<Customer> findCustomersByStatusAndCreatedBy(
       @Param("status") CustomerStatus status,
       @Param("createdBy") String createdBy);
+  Optional<Customer> findByAddressId(Long addressId);
 }

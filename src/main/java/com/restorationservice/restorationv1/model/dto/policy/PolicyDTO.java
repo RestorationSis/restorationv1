@@ -28,6 +28,6 @@ public class PolicyDTO {
   private LocalDate fromDate;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
   private LocalDate expirationDate;
-  private String policyHolder;
+  private List<String> policyHolders;
   private String status;
 }

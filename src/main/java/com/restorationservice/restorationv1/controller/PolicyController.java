@@ -27,7 +27,8 @@ public class PolicyController {
 
   @PostMapping("/register")
   public ResponseEntity<PolicyDTO> register(@Valid @RequestBody PolicyDTO request) {
-    policyService.addPolicy(request);
+    long policyId = policyService.addPolicy(request);
+    request.setPolicyId(policyId);
     return ResponseEntity.ok(request);
   }
 
@@ -48,8 +49,8 @@ public class PolicyController {
   }
 
   @GetMapping("/{policyId}")
-  public ResponseEntity<PolicyDTO> getPolicyById(@PathVariable String policyId) {
-    PolicyDTO policy = policyService.getPolicyById(policyId);
+  public ResponseEntity<PolicyFullDTO> getPolicyById(@PathVariable String policyId) {
+    PolicyFullDTO policy = policyService.getPolicyById(policyId);
     if (policy != null) {
       return ResponseEntity.ok(policy);
     } else {
@@ -94,8 +95,8 @@ public class PolicyController {
     return ResponseEntity.ok(companies);
   }
   @GetMapping("/address/{addressId}")
-  public ResponseEntity<List<PolicyDTO>> getPoliciesByAddress(@PathVariable Long addressId) {
-    List<PolicyDTO> policies = policyService.getPoliciesByAddressId(addressId);
+  public ResponseEntity<List<PolicyFullDTO>> getPoliciesByAddress(@PathVariable Long addressId) {
+    List<PolicyFullDTO> policies = policyService.getPoliciesByAddressId(addressId);
     return ResponseEntity.ok(policies);
   }
 

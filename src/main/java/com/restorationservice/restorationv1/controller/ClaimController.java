@@ -1,12 +1,13 @@
 package com.restorationservice.restorationv1.controller;
 
-import com.restorationservice.restorationv1.model.claim.ClaimInvoice;
 import com.restorationservice.restorationv1.model.claim.ClaimNotes;
 import com.restorationservice.restorationv1.model.dto.claim.ClaimInsuranceAdjusterDTO;
+import com.restorationservice.restorationv1.model.dto.claim.DamageTypeDTO;
 import com.restorationservice.restorationv1.model.dto.claim.ClaimInvoiceDTO;
 import com.restorationservice.restorationv1.service.ClaimInsuranceAdjusterService;
 import com.restorationservice.restorationv1.service.ClaimInvoiceService;
 import com.restorationservice.restorationv1.service.ClaimNotesService;
+import com.restorationservice.restorationv1.service.DamageTypeService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class ClaimController {
   private final ClaimNotesService claimNotesService;
   private final ClaimInvoiceService claimInvoiceService;
   private final ClaimInsuranceAdjusterService claimInsuranceAdjusterService;
+  private final DamageTypeService damageTypeService;
 
   @PostMapping("/notes")
   public ResponseEntity<com.restorationservice.restorationv1.dto.claim.ClaimNotesDTO> addNote(
@@ -175,5 +177,45 @@ public class ClaimController {
     } catch (IllegalArgumentException e) {
       return ResponseEntity.notFound().build();
     }
+  }
+
+
+  @PostMapping("/damage-types")
+  public ResponseEntity<DamageTypeDTO> addDamageType(@Valid @RequestBody DamageTypeDTO request) {
+    DamageTypeDTO damageType = damageTypeService.addDamageType(request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(damageType);
+  }
+
+  @PutMapping("/damage-types/{damageId}")
+  public ResponseEntity<DamageTypeDTO> updateDamageType(@PathVariable Long damageId,
+      @Valid @RequestBody DamageTypeDTO request) {
+    try {
+      DamageTypeDTO updated = damageTypeService.updateDamageType(damageId, request);
+      return ResponseEntity.ok(updated);
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  @DeleteMapping("/damage-types/{damageId}")
+  public ResponseEntity<Void> removeDamageType(@PathVariable Long damageId) {
+    boolean removed = damageTypeService.removeDamageType(damageId);
+    return removed ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+  }
+
+  @GetMapping("/damage-types/{damageId}")
+  public ResponseEntity<DamageTypeDTO> getDamageTypeById(@PathVariable Long damageId) {
+    try {
+      DamageTypeDTO dto = damageTypeService.getDamageTypeById(damageId);
+      return ResponseEntity.ok(dto);
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  @GetMapping("/damage-types")
+  public ResponseEntity<List<DamageTypeDTO>> getAllDamageTypes() {
+    List<DamageTypeDTO> damageTypes = damageTypeService.getAllDamageTypes();
+    return damageTypes.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(damageTypes);
   }
 }
